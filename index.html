@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>web-audio-scheduler</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
+    <style>
+      #code { padding: 0; margin: 0; background: white; border: none }
+      #app { margin: 10px 0 }
+      #app .btn { width: 100px }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
+    <script src="node_modules/web-audio-scheduler/build/web-audio-scheduler.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="page-header">
+        <h1>web-audio-scheduler</h1>
+        <div>
+          <a href="https://travis-ci.org/mohayonao/web-audio-scheduler"><img src="https://img.shields.io/travis/mohayonao/web-audio-scheduler.svg?style=flat-square"/></a>
+          <a href="https://www.npmjs.org/package/web-audio-scheduler"><img src="https://img.shields.io/npm/v/web-audio-scheduler.svg?style=flat-square"/></a>
+          <a href="https://mohayonao.mit-license.org/"><img src="https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square"/></a>
+        </div>
+      </div>
+      <div>Event Scheduler for Web Audio API | <a href="https://github.com/mohayonao/web-audio-scheduler" target="github">GitHub</a></div>
+      <div id="app">
+        <button id="button" class="btn btn-default">Start</button>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">example: metronome</h3>
+        </div>
+        <div class="panel-body">
+          <pre class="prettyprint" id="code"></pre>
+        </div>
+      </div>
+    </div>
+    <script>
+      var AudioContext = window.AudioContext || window.webkitAudioContext;
+      var $ = document.getElementById.bind(document);
+
+      function chore() {
+        if (chore.done) {
+          return;
+        }
+        chore.done = true;
+
+        var bufSrc = audioContext.createBufferSource();
+
+        bufSrc.buffer = audioContext.createBuffer(1, 4, audioContext.sampleRate);
+        bufSrc.start(0);
+        bufSrc.stop(bufSrc.buffer.duration);
+        bufSrc.connect(audioContext.destination);
+        bufSrc.disconnect();
+      }
+
+      window.addEventListener("DOMContentLoaded", function() {
+        var isPlaying = false;
+
+        $("button").addEventListener("click", function(e) {
+          isPlaying = !isPlaying;
+
+          if (isPlaying) {
+            chore();
+            start();
+            e.target.textContent = "Stop";
+          } else {
+            stop();
+            e.target.textContent = "Start";
+          }
+        });
+
+        // code
+        $("code").textContent = $("example").textContent;
+
+        prettyPrint();
+      });
+    </script>
+    <script id="example">
+      var audioContext = new AudioContext();
+      var sched = new WebAudioScheduler({ context: audioContext });
+      var masterGain = null;
+
+      function metronome(e) {
+        var t0 = e.playbackTime;
+
+        sched.insert(t0 + 0.000, ticktack, { frequency: 880, duration: 1.0 });
+        sched.insert(t0 + 1.000, ticktack, { frequency: 440, duration: 0.2 });
+        sched.insert(t0 + 2.000, ticktack, { frequency: 440, duration: 0.2 });
+        sched.insert(t0 + 3.000, ticktack, { frequency: 440, duration: 0.2 });
+        sched.insert(t0 + 4.000, ticktack, { frequency: 440, duration: 0.2 });
+        sched.insert(t0 + 5.000, ticktack, { frequency: 440, duration: 0.2 });
+        sched.insert(t0 + 6.000, ticktack, { frequency: 440, duration: 0.2 });
+        sched.insert(t0 + 7.000, ticktack, { frequency: 440, duration: 0.2 });
+        sched.insert(t0 + 8.000, ticktack, { frequency: 440, duration: 0.2 });
+        sched.insert(t0 + 9.000, ticktack, { frequency: 440, duration: 0.2 });
+        sched.insert(t0 + 10.000, metronome);
+      }
+
+      function ticktack(e) {
+        var t0 = e.playbackTime;
+        var t1 = t0 + e.args.duration;
+        var osc = audioContext.createOscillator();
+        var amp = audioContext.createGain();
+
+        osc.frequency.value = e.args.frequency;
+        osc.start(t0);
+        osc.stop(t1);
+        osc.connect(amp);
+
+        amp.gain.setValueAtTime(0.5, t0);
+        amp.gain.exponentialRampToValueAtTime(1e-6, t1);
+        amp.connect(masterGain);
+
+        sched.nextTick(t1, function() {
+          osc.disconnect();
+          amp.disconnect();
+        });
+      }
+
+      sched.on("start", function() {
+        masterGain = audioContext.createGain();
+        masterGain.connect(audioContext.destination);
+      });
+
+      sched.on("stop", function() {
+        masterGain.disconnect();
+        masterGain = null;
+      });
+
+      function start() {
+        sched.start(metronome);
+      }
+
+      function stop() {
+        sched.stop(true);
+      }
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          sched.aheadTime = 0.1;
+        } else {
+          sched.aheadTime = 1.0;
+          sched.process();
+        }
+      });
+    </script>
+  </body>
+</html>
