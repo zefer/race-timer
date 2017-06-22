@@ -11,7 +11,7 @@ var ui = (function() {
   }
 
   self.showTime = function(time) {
-    $('time').innerText = time.toFixed(0).toString();
+    $('time').innerText = Math.floor(time).toString();
   }
 
   return self;
