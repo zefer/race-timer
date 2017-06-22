@@ -101,15 +101,6 @@ var player = (function() {
     self.masterGain = null;
   });
 
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") {
-      self.sched.aheadTime = 0.1;
-    } else {
-      self.sched.aheadTime = 1.0;
-      self.sched.process();
-    }
-  });
-
   return self;
 })();
 
