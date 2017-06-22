@@ -49,7 +49,6 @@ var ticks = [];
 for (var i=70; i>=0; i--) {
   ticks.push(i);
 }
-console.log(ticks);
 var audioTicks = [60,50,40,30,20,10,9,8,7,6,5,4,3,2,1,0];
 var sounds = {}
 for(var tick in audioTicks) {
@@ -63,11 +62,8 @@ loadSounds();
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 // var context = new AudioContext();
 
-window.sounds = sounds;
-
 function attachSound(key, request) {
   audioContext.decodeAudioData(request.response, function(buffer) {
-    console.log(key)
     sounds[key] = buffer;
   }.bind(this), function(e) { console.log(e); });
 }
@@ -76,8 +72,6 @@ function loadSounds() {
   for (var key in sounds) {
     var url = 'audio/' + key + '.mp3';
     var request = new XMLHttpRequest();
-
-    console.log(key);
 
     request.open('GET', url, true);
     request.responseType = 'arraybuffer';
@@ -116,7 +110,6 @@ function metronome(e) {
     } else if(sounds[tick]) {
       sched.insert(t, playSound.bind(this, sounds[tick]));
     } else {
-      console.log("n")
       sched.insert(t, ticktack, { frequency: 440, duration: 0.2 });
     }
   }
