@@ -29,6 +29,16 @@ var player = (function() {
     source.start(0);
   }
 
+  self.sched.on("start", function() {
+    self.masterGain = self.audioContext.createGain();
+    self.masterGain.connect(self.audioContext.destination);
+  });
+
+  self.sched.on("stop", function() {
+    self.masterGain.disconnect();
+    self.masterGain = null;
+  });
+
   return self;
 })();
 
@@ -136,16 +146,6 @@ function ticktack(e) {
     amp.disconnect();
   });
 }
-
-player.sched.on("start", function() {
-  player.masterGain = player.audioContext.createGain();
-  player.masterGain.connect(player.audioContext.destination);
-});
-
-player.sched.on("stop", function() {
-  player.masterGain.disconnect();
-  player.masterGain = null;
-});
 
 function start() {
   player.sched.start(sequence);
