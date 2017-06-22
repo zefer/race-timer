@@ -31,18 +31,21 @@ var player = (function() {
   // A bank of loaded sound buffers.
   self.sounds = {}
 
-  self.init = function() {
-    if (self.init.done) {
-      return;
-    }
-    self.init.done = true;
-
+  init = function() {
     var bufSrc = self.audioContext.createBufferSource();
     bufSrc.buffer = self.audioContext.createBuffer(1, 4, self.audioContext.sampleRate);
     bufSrc.start(0);
     bufSrc.stop(bufSrc.buffer.duration);
     bufSrc.connect(self.audioContext.destination);
     bufSrc.disconnect();
+  }();
+
+  self.start = function() {
+    self.sched.start(sequence);
+  }
+
+  self.stop = function() {
+    self.sched.stop(true);
   }
 
   self.loadSound = function(key, url) {
@@ -129,15 +132,6 @@ var timer = (function() {
     }
   }();
 
-  start = function() {
-    player.init();
-    player.sched.start(sequence);
-  }
-
-  stop = function() {
-    player.sched.stop(true);
-  }
-
   sequence = function(e) {
     var ticks = [];
     for (var i=countdownSecs+preCountdownSecs; i>=0; i--) {
@@ -171,10 +165,10 @@ var timer = (function() {
   self.toggle = function() {
     self.playing = !self.playing;
     if (self.playing) {
-      start();
+      player.start();
       return "Stop";
     } else {
-      stop();
+      player.stop();
       return "Start";
     }
   }
