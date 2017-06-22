@@ -57,6 +57,7 @@ var timer = (function() {
   self.playing = false;
 
   start = function() {
+    player.init();
     player.sched.start(sequence);
   }
 
@@ -67,7 +68,6 @@ var timer = (function() {
   self.toggle = function() {
     self.playing = !self.playing;
     if (self.playing) {
-      player.init();
       start();
       return "Stop";
     } else {
