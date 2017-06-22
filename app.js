@@ -8,6 +8,7 @@ var player = (function() {
   self.sched = new WebAudioScheduler({ context: self.audioContext });
   self.masterGain = null;
 
+  // A bank of loaded sound buffers.
   self.sounds = {}
 
   self.init = function() {
@@ -28,7 +29,6 @@ var player = (function() {
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
     request.responseType = 'arraybuffer';
-    // request.onload = attachSound.bind(this, tick, request);
     request.onload = function() {
       self.audioContext.decodeAudioData(request.response, function(buffer) {
         self.sounds[key] = buffer;
