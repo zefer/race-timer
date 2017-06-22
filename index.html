@@ -5,8 +5,15 @@
     <title>Race Timer</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <style>
-      #app { margin: 10px 0 }
-      #app .btn { width: 100px }
+      body {
+        text-align: center;
+      }
+      #app .btn {
+        padding: 20px 60px;
+        text-align: center;
+        text-transform: uppercase;
+        border: 1px solid #888;
+      }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
     <script src="node_modules/web-audio-scheduler/build/web-audio-scheduler.min.js"></script>
@@ -17,7 +24,6 @@
       <div class="page-header">
         <h1>Race Timer</h1>
       </div>
-      <div>Uses: Event Scheduler for Web Audio API | <a href="https://github.com/mohayonao/web-audio-scheduler" target="github">GitHub</a></div>
       <div id="app">
         <button id="button" class="btn btn-default">Start</button>
       </div>
