@@ -44,20 +44,82 @@ var audioContext = new AudioContext();
 var sched = new WebAudioScheduler({ context: audioContext });
 var masterGain = null;
 
+
+var ticks = [];
+for (var i=70; i>=0; i--) {
+  ticks.push(i);
+}
+console.log(ticks);
+var audioTicks = [60,50,40,30,20,10,9,8,7,6,5,4,3,2,1,0];
+var sounds = {}
+for(var tick in audioTicks) {
+  sounds[audioTicks[tick.toString()]] = null;
+}
+loadSounds();
+
+
+
+// Fix up prefixing
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+// var context = new AudioContext();
+
+window.sounds = sounds;
+
+function attachSound(key, request) {
+  audioContext.decodeAudioData(request.response, function(buffer) {
+    console.log(key)
+    sounds[key] = buffer;
+  }.bind(this), function(e) { console.log(e); });
+}
+
+function loadSounds() {
+  for (var key in sounds) {
+    var url = 'audio/' + key + '.mp3';
+    var request = new XMLHttpRequest();
+
+    console.log(key);
+
+    request.open('GET', url, true);
+    request.responseType = 'arraybuffer';
+
+    // Decode asynchronously
+    request.onload = attachSound.bind(this, key, request);
+    // request.onload = function() {
+    //   audioContext.decodeAudioData(request.response, function(buffer) {
+    //     sounds[key] = buffer;
+    //   }, function(e) { console.log(e); });
+    // }
+    request.send();
+  }
+}
+
+function playSound(buffer) {
+  var source = audioContext.createBufferSource(); // creates a sound source
+  source.buffer = buffer;                    // tell the source which sound to play
+  source.connect(audioContext.destination);       // connect the source to the context's destination (the speakers)
+  source.start(0);                           // play the source now
+                                             // note: on older systems, may have to use deprecated noteOn(time);
+}
+
+
+
+
 function metronome(e) {
   var t0 = e.playbackTime;
 
-  sched.insert(t0 + 0.000, ticktack, { frequency: 880, duration: 1.0 });
-  sched.insert(t0 + 1.000, ticktack, { frequency: 440, duration: 0.2 });
-  sched.insert(t0 + 2.000, ticktack, { frequency: 440, duration: 0.2 });
-  sched.insert(t0 + 3.000, ticktack, { frequency: 440, duration: 0.2 });
-  sched.insert(t0 + 4.000, ticktack, { frequency: 440, duration: 0.2 });
-  sched.insert(t0 + 5.000, ticktack, { frequency: 440, duration: 0.2 });
-  sched.insert(t0 + 6.000, ticktack, { frequency: 440, duration: 0.2 });
-  sched.insert(t0 + 7.000, ticktack, { frequency: 440, duration: 0.2 });
-  sched.insert(t0 + 8.000, ticktack, { frequency: 440, duration: 0.2 });
-  sched.insert(t0 + 9.000, ticktack, { frequency: 440, duration: 0.2 });
-  sched.insert(t0 + 10.000, metronome);
+  for (var i in ticks) {
+    tick = ticks[i];
+    t = t0 + (ticks[0]-parseInt(tick))
+
+    if(parseInt(tick) > 60) {
+      sched.insert(t, ticktack, { frequency: 880, duration: 0.2 });
+    } else if(sounds[tick]) {
+      sched.insert(t, playSound.bind(this, sounds[tick]));
+    } else {
+      console.log("n")
+      sched.insert(t, ticktack, { frequency: 440, duration: 0.2 });
+    }
+  }
 }
 
 function ticktack(e) {
