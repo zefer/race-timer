@@ -2,38 +2,34 @@ var AudioContext = window.AudioContext || window.webkitAudioContext;
 var $ = document.getElementById.bind(document);
 
 var player = (function() {
-  var audioContext = new AudioContext();
-  var sched = new WebAudioScheduler({ context: audioContext });
-  var masterGain = null;
+  var self = {};
 
-  var init = function() {
-    if (init.done) {
+  self.audioContext = new AudioContext();
+  self.sched = new WebAudioScheduler({ context: self.audioContext });
+  self.masterGain = null;
+
+  self.init = function() {
+    if (self.init.done) {
       return;
     }
-    init.done = true;
+    self.init.done = true;
 
-    var bufSrc = audioContext.createBufferSource();
-    bufSrc.buffer = audioContext.createBuffer(1, 4, audioContext.sampleRate);
+    var bufSrc = self.audioContext.createBufferSource();
+    bufSrc.buffer = self.audioContext.createBuffer(1, 4, self.audioContext.sampleRate);
     bufSrc.start(0);
     bufSrc.stop(bufSrc.buffer.duration);
-    bufSrc.connect(audioContext.destination);
+    bufSrc.connect(self.audioContext.destination);
     bufSrc.disconnect();
   }
 
-  var playSound = function(buffer) {
-    var source = audioContext.createBufferSource();
+  self.playSound = function(buffer) {
+    var source = self.audioContext.createBufferSource();
     source.buffer = buffer;
-    source.connect(audioContext.destination);
+    source.connect(self.audioContext.destination);
     source.start(0);
   }
 
-  return {
-    init: init,
-    playSound: playSound,
-    audioContext: audioContext,
-    sched: sched,
-    masterGain: masterGain
-  };
+  return self;
 })();
 
 var app = (function() {
