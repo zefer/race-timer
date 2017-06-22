@@ -39,6 +39,16 @@ var player = (function() {
     self.masterGain = null;
   });
 
+  document.addEventListener("visibilitychange", () => {
+    console.log("vischange");
+    if (document.visibilityState === "visible") {
+      self.sched.aheadTime = 0.1;
+    } else {
+      self.sched.aheadTime = 1.0;
+      self.sched.process();
+    }
+  });
+
   return self;
 })();
 
@@ -154,13 +164,3 @@ function start() {
 function stop() {
   player.sched.stop(true);
 }
-
-document.addEventListener("visibilitychange", () => {
-  console.log("vischange");
-  if (document.visibilityState === "visible") {
-    player.sched.aheadTime = 0.1;
-  } else {
-    player.sched.aheadTime = 1.0;
-    player.sched.process();
-  }
-});
