@@ -52,28 +52,38 @@ var player = (function() {
   return self;
 })();
 
-var app = (function() {
-  return {
-  };
-});
+var timer = (function() {
+  var self = {};
+  self.playing = false;
 
-window.addEventListener("DOMContentLoaded", function() {
-  var isPlaying = false;
+  start = function() {
+    player.sched.start(sequence);
+  }
 
-  $("button").addEventListener("click", function(e) {
-    isPlaying = !isPlaying;
+  stop = function() {
+    player.sched.stop(true);
+  }
 
-    if (isPlaying) {
+  self.toggle = function() {
+    self.playing = !self.playing;
+    if (self.playing) {
       player.init();
       start();
-      e.target.textContent = "Stop";
+      return "Stop";
     } else {
       stop();
-      e.target.textContent = "Start";
+      return "Start";
     }
+  }
+
+  return self;
+})();
+
+window.addEventListener("DOMContentLoaded", function() {
+  $("button").addEventListener("click", function(e) {
+    e.target.textContent = timer.toggle();
   });
 });
-
 
 
 
@@ -155,12 +165,4 @@ function ticktack(e) {
     osc.disconnect();
     amp.disconnect();
   });
-}
-
-function start() {
-  player.sched.start(sequence);
-}
-
-function stop() {
-  player.sched.stop(true);
 }
