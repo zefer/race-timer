@@ -44,6 +44,27 @@ var player = (function() {
     source.start(0);
   }
 
+  self.playTick = function(e) {
+    var t0 = e.playbackTime;
+    var t1 = t0 + e.args.duration;
+    var osc = player.audioContext.createOscillator();
+    var amp = player.audioContext.createGain();
+
+    osc.frequency.value = e.args.frequency;
+    osc.start(t0);
+    osc.stop(t1);
+    osc.connect(amp);
+
+    amp.gain.setValueAtTime(0.5, t0);
+    amp.gain.exponentialRampToValueAtTime(1e-6, t1);
+    amp.connect(player.masterGain);
+
+    player.sched.nextTick(t1, function() {
+      osc.disconnect();
+      amp.disconnect();
+    });
+  }
+
   self.sched.on("start", function() {
     self.masterGain = self.audioContext.createGain();
     self.masterGain.connect(self.audioContext.destination);
@@ -108,34 +129,13 @@ var timer = (function() {
       t = t0 + (ticks[0]-parseInt(tick))
 
       if(parseInt(tick) > 60) {
-        player.sched.insert(t, ticktack, { frequency: 880, duration: 0.2 });
+        player.sched.insert(t, player.playTick, { frequency: 880, duration: 0.2 });
       } else if(player.sounds[tick]) {
         player.sched.insert(t, player.playSound.bind(this, player.sounds[tick]));
       } else {
-        player.sched.insert(t, ticktack, { frequency: 440, duration: 0.2 });
+        player.sched.insert(t, player.playTick, { frequency: 440, duration: 0.2 });
       }
     }
-  }
-
-  ticktack = function(e) {
-    var t0 = e.playbackTime;
-    var t1 = t0 + e.args.duration;
-    var osc = player.audioContext.createOscillator();
-    var amp = player.audioContext.createGain();
-
-    osc.frequency.value = e.args.frequency;
-    osc.start(t0);
-    osc.stop(t1);
-    osc.connect(amp);
-
-    amp.gain.setValueAtTime(0.5, t0);
-    amp.gain.exponentialRampToValueAtTime(1e-6, t1);
-    amp.connect(player.masterGain);
-
-    player.sched.nextTick(t1, function() {
-      osc.disconnect();
-      amp.disconnect();
-    });
   }
 
   self.toggle = function() {
