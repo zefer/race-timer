@@ -1,6 +1,26 @@
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 var $ = document.getElementById.bind(document);
 
+var ui = (function() {
+  var self = {};
+
+  self.attachEvents = function() {
+    $('button').addEventListener("click", function(e) {
+      e.target.textContent = timer.toggle();
+    });
+  }
+
+  self.showTime = function(time) {
+    $('time').innerText = time.toFixed(0).toString();
+  }
+
+  return self;
+})();
+
+window.addEventListener("DOMContentLoaded", function() {
+  ui.attachEvents();
+});
+
 var player = (function() {
   var self = {};
 
@@ -39,6 +59,7 @@ var player = (function() {
 
   self.playSound = function(buffer) {
     var source = self.audioContext.createBufferSource();
+    timer.onTick(self.sched.playbackTime);
     source.buffer = buffer;
     source.connect(self.audioContext.destination);
     source.start(0);
@@ -49,6 +70,8 @@ var player = (function() {
     var t1 = t0 + e.args.duration;
     var osc = player.audioContext.createOscillator();
     var amp = player.audioContext.createGain();
+
+    timer.onTick(t0);
 
     osc.frequency.value = e.args.frequency;
     osc.start(t0);
@@ -141,6 +164,11 @@ var timer = (function() {
     }
   }
 
+  self.onTick = function(t) {
+    time = countdownSecs + preCountdownSecs - t + 1;
+    ui.showTime(time);
+  }
+
   self.toggle = function() {
     self.playing = !self.playing;
     if (self.playing) {
@@ -154,9 +182,3 @@ var timer = (function() {
 
   return self;
 })();
-
-window.addEventListener("DOMContentLoaded", function() {
-  $("button").addEventListener("click", function(e) {
-    e.target.textContent = timer.toggle();
-  });
-});
