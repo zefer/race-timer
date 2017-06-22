@@ -1,0 +1,18 @@
+{
+  "name": "zefer-race-timer",
+  "description": "Simple model yacht race start timer",
+  "version": "0.0.0",
+  "author": "Joe Roberts <joe@zefer.co.uk>",
+  "dependencies": {
+    "web-audio-scheduler": "1.4.0"
+  },
+  "devDependencies": {},
+  "homepage": "https://github.com/zefer",
+  "keywords": [],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mohayonao/web-audio-scheduler.git"
+  },
+  "scripts": {}
+}
