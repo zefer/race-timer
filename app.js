@@ -99,7 +99,6 @@ var player = (function() {
   });
 
   document.addEventListener("visibilitychange", () => {
-    console.log("vischange");
     if (document.visibilityState === "visible") {
       self.sched.aheadTime = 0.1;
     } else {
