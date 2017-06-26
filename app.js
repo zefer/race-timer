@@ -25,22 +25,34 @@ var player = (function() {
   var self = {};
 
   self.audioContext = new AudioContext();
-  self.sched = new WebAudioScheduler({ context: self.audioContext });
-  self.masterGain = null;
-
   // A bank of loaded sound buffers.
   self.sounds = {}
 
-  init = function() {
+  self.start = function() {
+    // Re-init each time because it resets (rewinds) the sequence and allows us
+    // to get an accurate playbackTime from when the sequence started.
+    self.audioContext.close();
+    self.audioContext = new AudioContext();
+    self.sched = new WebAudioScheduler({ context: self.audioContext });
+    self.masterGain = null;
+
     var bufSrc = self.audioContext.createBufferSource();
     bufSrc.buffer = self.audioContext.createBuffer(1, 4, self.audioContext.sampleRate);
     bufSrc.start(0);
     bufSrc.stop(bufSrc.buffer.duration);
     bufSrc.connect(self.audioContext.destination);
     bufSrc.disconnect();
-  }();
 
-  self.start = function() {
+    self.sched.on("start", function() {
+      self.masterGain = self.audioContext.createGain();
+      self.masterGain.connect(self.audioContext.destination);
+    });
+
+    self.sched.on("stop", function() {
+      self.masterGain.disconnect();
+      self.masterGain = null;
+    });
+
     self.sched.start(sequence);
   }
 
@@ -91,16 +103,6 @@ var player = (function() {
     });
   }
 
-  self.sched.on("start", function() {
-    self.masterGain = self.audioContext.createGain();
-    self.masterGain.connect(self.audioContext.destination);
-  });
-
-  self.sched.on("stop", function() {
-    self.masterGain.disconnect();
-    self.masterGain = null;
-  });
-
   return self;
 })();
 
@@ -149,7 +151,7 @@ var timer = (function() {
   }
 
   self.onTick = function(t) {
-    time = countdownSecs + preCountdownSecs - t + 1;
+    time = countdownSecs + preCountdownSecs - t;
     ui.showTime(time);
   }
 
