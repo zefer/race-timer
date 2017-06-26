@@ -5,13 +5,15 @@ var ui = (function() {
   var self = {};
 
   self.attachEvents = function() {
-    $('button').addEventListener("click", function(e) {
-      e.target.textContent = timer.toggle();
-    });
+    $('button').addEventListener("click", timer.toggle);
+  }
+
+  self.setButtonText = function(text) {
+    $('button').textContent = text;
   }
 
   self.showTime = function(time) {
-    $('time').innerText = Math.floor(time).toString();
+    $('time').textContent = Math.floor(time).toString();
   }
 
   return self;
@@ -152,18 +154,22 @@ var timer = (function() {
   }
 
   self.onTick = function(t) {
-    time = countdownSecs + preCountdownSecs - t;
-    ui.showTime(time);
+    sequenceTotal = countdownSecs + preCountdownSecs;
+    countdownTime = sequenceTotal - t;
+    ui.showTime(countdownTime);
+    if(t >= sequenceTotal) {
+      self.toggle();
+    }
   }
 
   self.toggle = function() {
     self.playing = !self.playing;
     if (self.playing) {
       player.start();
-      return "Stop";
+      ui.setButtonText('Stop');
     } else {
       player.stop();
-      return "Start";
+      ui.setButtonText('Start');
     }
   }
 
