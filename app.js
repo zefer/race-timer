@@ -139,13 +139,14 @@ var timer = (function() {
 
       if(parseInt(tick) > countdownSecs) {
         // Pre-countdown.
-        player.sched.insert(t, player.playTick, { frequency: 880, duration: 0.2 });
+        frequency = 300+(i*50);
+        player.sched.insert(t, player.playTick, { frequency: frequency, duration: 0.2 });
       } else if(player.sounds[tick]) {
         // Countdown audio file available.
         player.sched.insert(t, player.playSound.bind(this, player.sounds[tick]));
       } else {
         // Countdown tick.
-        player.sched.insert(t, player.playTick, { frequency: 440, duration: 0.2 });
+        player.sched.insert(t, player.playTick, { frequency: 750, duration: 0.2 });
       }
     }
   }
