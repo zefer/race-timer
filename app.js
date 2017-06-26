@@ -3,24 +3,27 @@ var $ = document.getElementById.bind(document);
 
 var ui = (function() {
   var self = {};
+  var $button, $time;
 
-  self.attachEvents = function() {
-    $('button').addEventListener("click", timer.toggle);
+  self.init = function() {
+    $button = $('button');
+    $time = $('time');
+    $button.addEventListener("click", timer.toggle);
   }
 
   self.setButtonText = function(text) {
-    $('button').textContent = text;
+    $button.textContent = text;
   }
 
   self.showTime = function(time) {
-    $('time').textContent = Math.floor(time).toString();
+    $time.textContent = Math.floor(time).toString();
   }
 
   return self;
 })();
 
 window.addEventListener("DOMContentLoaded", function() {
-  ui.attachEvents();
+  ui.init();
 });
 
 var player = (function() {
