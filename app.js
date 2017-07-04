@@ -120,7 +120,7 @@ var timer = (function() {
   // Number of warning ticks to play before the countdown.
   var preCountdownSecs = 10;
   // These ticks will be played as mp3 audio files.
-  var audioTicks = [60,50,40,30,20,10,9,8,7,6,5,4,3,2,1,0];
+  var audioTicks = [60,50,40,30,25,20,15,10,9,8,7,6,5,4,3,2,1,0];
 
   loadSounds = function() {
     for (var i in audioTicks) {
