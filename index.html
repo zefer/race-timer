@@ -12,7 +12,7 @@
     <script src="app.js"></script>
     <script>
       if('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js', {scope: '/'})
+        navigator.serviceWorker.register('sw.js', {scope: window.location.pathname})
           .then(function(registration) {});
         navigator.serviceWorker.ready.then(function(registration) {});
       }

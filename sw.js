@@ -5,7 +5,7 @@ self.addEventListener('install', e => {
 
   var audioTicks = [60,50,40,30,25,20,15,10,9,8,7,6,5,4,3,2,1,0];
   var audio = audioTicks.map(x => {return `audio/${x}.mp3`})
-  var misc = ['/index.html', '/app.css', '/app.js'];
+  var misc = ['index.html', 'app.css', 'app.js'];
   var allFiles = misc.concat(audio).map(x => {
     return `${x}?timestamp=${timeStamp}`;
   })
