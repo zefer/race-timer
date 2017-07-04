@@ -1,0 +1,11 @@
+#!/bin/bash
+
+mkdir build
+rm audio/*.mp3
+
+for i in 60 50 40 30 20 10 9 8 7 6 5 4 3 2 1 0; do
+  say -v Samantha $i -o "build/$i.wave"
+  ffmpeg -i "build/$i.wave" -codec:a libmp3lame -qscale:a 9 "audio/$i.mp3" 
+done
+
+rm -r build
