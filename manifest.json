@@ -1,6 +1,6 @@
 {
-  "name": "Timer",
-  "short_name": "Timer",
+  "name": "zefochron",
+  "short_name": "zefochron",
   "icons": [{
     "src": "icon.png",
       "type": "image/png"
